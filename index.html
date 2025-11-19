@@ -1,434 +1,872 @@
 <!doctype html>
 <html lang="en">
+
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Sulav Pariyar — Personal Dashboard</title>
-<style>
-  :root{
-    --bg:#0f1724;
-    --card:#0b1220;
-    --accent:#8ab4ff;
-    --muted:#9aa7bf;
-  }
-  html,body{
-    height:100%;
-    margin:0;
-    font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;
-    color:#dbe7ff;
-    background:linear-gradient(180deg,var(--bg), #071026 80%);
-    overflow:hidden;
-    cursor:none; /* hide default cursor */
-  }
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Sulav Pariyar — Personal Dashboard</title>
 
-  /* Click-to-enter overlay */
-  #overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.95);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-    z-index: 9999;
-    color: #fff;
-    font-size: 32px;
-    font-weight: 600;
-    user-select: none;
-    overflow: hidden;
-    opacity:1;
-    transition: opacity 0.8s ease;
-  }
-  #overlay.fade-out{
-    opacity:0;
-    pointer-events:none;
-  }
-  #overlay canvas {
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-  }
+  <!-- Fonts -->
+  <link
+    href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800;900&family=Inter:wght@300;600&display=swap"
+    rel="stylesheet">
 
-  .stage{
-    min-height:100vh;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    perspective:1000px;
-    position:relative;
-  }
+  <style>
+    :root {
+      --bg-1: #071026;
+      --bg-2: #0f1724;
+      --glass: rgba(255, 255, 255, 0.04);
+      --accent-c: #00f0e6;
+      /* cyan */
+      --accent-p: #a78bfa;
+      /* purple */
+      --muted: #9aa7bf;
+      --card-radius: 20px;
+    }
 
-  /* Background layers */
-  .layer{
-    position:absolute;
-    inset:0;
-    pointer-events:none;
-    transform-style:preserve-3d;
-  }
-  .layer .shape{
-    position:absolute;
-    will-change:transform,opacity;
-    filter:blur(30px) contrast(1.1);
-    opacity:0.55;
-    mix-blend-mode:screen;
-  }
-  .shape.s1{ width:420px;height:420px;border-radius:50%; background:linear-gradient(135deg,#7dd3fc,#60a5fa); left:10%; top:10%; }
-  .shape.s2{ width:600px;height:260px;border-radius:40px; background:linear-gradient(135deg,#a78bfa,#60a5fa); right:5%; top:5%; transform-origin:center; }
-  .shape.s3{ width:360px;height:360px;border-radius:26px; background:linear-gradient(135deg,#34d399,#60a5fa); left:30%; bottom:15%; }
+    /* Base */
+    html,
+    body {
+      height: 100%;
+      margin: 0;
+      background: linear-gradient(180deg, var(--bg-2), var(--bg-1) 85%);
+      background-image: url('assets/gojo-blue-eyes-jjk.1920x1080.gif');
+      /* Set your gif path here */
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, "Montserrat", Arial;
+      color: #e6f7ff;
+      overflow: hidden
+    }
 
-  /* Card */
-  .card{
-    position:relative;
-    width:920px;
-    max-width:94%;
-    background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-    border-radius:16px;
-    padding:32px;
-    box-shadow: 0 10px 50px rgba(2,6,23,0.6), inset 0 1px 0 rgba(255,255,255,0.02);
-    display:flex;
-    gap:24px;
-    align-items:center;
-    transform-style:preserve-3d;
-    will-change:transform,clip-path;
-    border: 1px solid rgba(255,255,255,0.03);
-    backdrop-filter: blur(6px) saturate(120%);
-  }
 
-  .avatar{
-    width:180px;
-    height:180px;
-    border-radius:50%;
-    flex:0 0 180px;
-    overflow:hidden;
-    background:linear-gradient(135deg,#1e293b,#0b1220);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    box-shadow: 0 6px 30px rgba(2,6,23,0.6);
-    transform-style:preserve-3d;
-    position:relative;
-}
-.avatar img{
-    width:100%;
-    height:100%;
-    object-fit:cover;
-    display:block;
-    border-radius:50%;
-}
-.particles-canvas {
-    position:absolute;
-    inset:0;
-    border-radius:50%;
-    pointer-events:none;
-}
+    .layout {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 30px;
+      box-sizing: border-box;
+      position: relative;
+      z-index: 1
+    }
 
-  .meta{flex:1; min-width:0}
-  .meta h1{margin:0;font-size:28px;letter-spacing:0.4px;color:#e6f0ff}
-  .meta p{margin:8px 0 16px;color:var(--muted)}
-  .links{display:flex;gap:10px;flex-wrap:wrap}
-  .links a{display:inline-block;padding:10px 14px;border-radius:10px;background:rgba(255,255,255,0.03);color:#d4e7ff;text-decoration:none;border:1px solid rgba(255,255,255,0.02);font-weight:600}
-  .links a:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(12,18,30,0.45)}
+    /* Optional fallback overlay to darken video */
+    .bg-dim {
+      position: fixed;
+      inset: 0;
+      z-index: -15;
+      background: linear-gradient(180deg, rgba(3, 6, 12, 0.18), rgba(2, 6, 10, 0.42));
+      pointer-events: none
+    }
 
-  /* cursor follower */
-  .cursor-follower{
-    position:fixed;
-    left:0;top:0;
-    width:22px;height:22px;border-radius:50%;
-    transform:translate(-50%,-50%);
-    pointer-events:none;
-    background:radial-gradient(circle at 35% 30%, rgba(255,255,255,0.95), rgba(255,255,255,0.6) 10%, rgba(138,180,255,0.15) 30%);
-    border:1px solid rgba(255,255,255,0.6);
-    box-shadow:0 0 15px rgba(138,180,255,0.6),0 6px 20px rgba(37,99,235,0.12);
-    will-change:transform,opacity;
-    mix-blend-mode:screen;
-    z-index:9999;
-  }
+    /* Click-to-enter overlay + snow */
+    #overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      background: rgba(3, 6, 12, 0.86);
+      color: #fff;
+      font-weight: 700;
+      font-size: 26px;
+      user-select: none;
+      transition: opacity .7s
+    }
 
-  footer{position:fixed;left:16px;bottom:12px;color:rgba(255,255,255,0.35);font-size:13px}
+    #overlay.fade-out {
+      opacity: 0;
+      pointer-events: none
+    }
 
-  @media (max-width:700px){
-    .card{flex-direction:column;gap:18px;padding:20px}
-    .avatar{width:140px;height:140px}
-    .cursor-follower{display:none}
-  }
+    #overlay canvas {
+      position: absolute;
+      inset: 0;
+      pointer-events: none
+    }
 
-  /* music card */
-  .music-card{
-    margin-top:20px;
-    flex-direction:column;
-    gap:8px;
-    padding:16px 20px;
-    width:880px;
-    max-width:90%;
-    display:flex;
-    border-radius:14px;
-    background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-    border:1px solid rgba(255,255,255,0.04);
-    backdrop-filter:blur(6px);
-    box-shadow:0 6px 20px rgba(2,6,23,0.6);
-    z-index:3;
-    cursor:pointer;
-    transform-style:preserve-3d;
-    transition: transform 0.2s ease;
-  }
-  .music-controls{display:flex;align-items:center;justify-content:space-between}
-  .music-controls button{
-    background:none;
-    border:none;
-    font-size:28px;
-    cursor:pointer;
-    transition: transform 0.2s ease, color 0.2s ease;
-  }
-  .music-controls button.playing{
-    transform: scale(1.25) rotate(15deg);
-    color:var(--accent);
-  }
-  .song-title{font-size:16px;font-weight:600;color:#dbe7ff}
-  .progress{width:100%;height:6px;background:rgba(255,255,255,0.1);border-radius:4px;overflow:hidden;margin-top:4px;position:relative}
-  .progress-fill{height:100%;width:0%;background:linear-gradient(90deg,#60a5fa,#a78bfa);transition:width 0.05s linear;position:relative}
-  .progress-dot{position:absolute;top:50%;left:0%;width:10px;height:10px;background:#fff;border-radius:50%;transform:translate(-50%,-50%);box-shadow:0 2px 8px rgba(0,0,0,0.4)}
-  .volume-control {
-    margin-top:10px;
-    display:flex;
-    align-items:center;
-    gap:8px;
-  }
-  .volume-control input[type=range] {
-    width:120px;
-    height:4px;
-    cursor: pointer;
-  }
-</style>
+    .enter-btn {
+      margin-top: 18px;
+      padding: 12px 18px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01));
+      cursor: pointer;
+      color: #e6f7ff;
+      font-weight: 700
+    }
+
+    /* Panel wrapper */
+    .panel-wrap {
+      width: 980px;
+      max-width: 96%;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      align-items: stretch;
+    }
+
+    /* Info card */
+    .info-card {
+      display: flex;
+      gap: 22px;
+      padding: 28px;
+      border-radius: var(--card-radius);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01));
+      border: 1px solid var(--glass);
+      box-shadow: 0 18px 60px rgba(2, 6, 23, 0.6);
+      backdrop-filter: blur(8px) saturate(120%);
+      position: relative;
+      overflow: visible;
+      transform-style: preserve-3d;
+      z-index: 10;
+    }
+
+    .left {
+      width: 200px;
+      flex: 0 0 200px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px
+    }
+
+    .avatar {
+      width: 160px;
+      height: 160px;
+      border-radius: 50%;
+      overflow: hidden;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #0b1220, #1e293b);
+      box-shadow: 0 12px 40px rgba(2, 6, 23, 0.65);
+      border: 3px solid rgba(255, 255, 255, 0.03)
+    }
+
+    .avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      border-radius: 50%
+    }
+
+    .avatar canvas {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      border-radius: 50%;
+      mix-blend-mode: screen;
+    }
+
+    .right {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 8px
+    }
+
+    .name-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap
+    }
+
+    .name {
+      font-family: "Montserrat", "Inter", sans-serif;
+      font-weight: 900;
+      font-size: 34px;
+      letter-spacing: 1px;
+      color: var(--accent-c);
+      text-shadow: 0 4px 18px rgba(0, 240, 230, 0.12), 0 10px 40px rgba(0, 0, 0, 0.45);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      white-space: nowrap;
+    }
+
+    .tagline {
+      color: var(--muted);
+      font-size: 14px;
+      margin-top: 6px
+    }
+
+    .badges {
+      display: flex;
+      gap: 8px;
+      align-items: center
+    }
+
+    .badge {
+      width: 26px;
+      height: 26px;
+      border-radius: 8px;
+      display: inline-grid;
+      place-items: center;
+      font-size: 12px;
+      font-weight: 800;
+      color: #031226;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45)
+    }
+
+    .badge.cyan {
+      background: linear-gradient(180deg, var(--accent-c), #30d6c6)
+    }
+
+    .badge.purple {
+      background: linear-gradient(180deg, var(--accent-p), #825de6);
+      color: #fff
+    }
+
+    .subcards {
+      display: flex;
+      gap: 16px;
+      margin-top: 14px
+    }
+
+    .subcard {
+      flex: 1;
+      min-width: 0;
+      padding: 14px;
+      border-radius: 14px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01));
+      border: 1px solid rgba(255, 255, 255, 0.03);
+      box-shadow: 0 8px 34px rgba(2, 6, 23, 0.45);
+      display: flex;
+      gap: 12px;
+      align-items: center
+    }
+
+    .subcard .icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 12px;
+      overflow: hidden;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, #2b2a4a, #6b2d8f)
+    }
+
+    .subcard .title {
+      font-weight: 800;
+      color: var(--accent-c);
+      font-size: 15px
+    }
+
+    .subcard .desc {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 4px
+    }
+
+    .social-row {
+      display: flex;
+      justify-content: center;
+      gap: 22px;
+      margin-top: 18px;
+      align-items: center
+    }
+
+    .social-row a {
+      width: 40px;
+      height: 40px;
+      display: inline-grid;
+      place-items: center;
+      border-radius: 10px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01));
+      border: 1px solid rgba(255, 255, 255, 0.02);
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
+      text-decoration: none;
+      color: inherit;
+      filter: drop-shadow(0 8px 30px rgba(0, 0, 0, 0.4));
+      transition: transform .18s
+    }
+
+    .social-row a:hover {
+      transform: translateY(-6px)
+    }
+
+    /* Music panel (same magnet + elevated) */
+    .music-wrap {
+      margin-top: 12px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 16px 18px;
+      border-radius: 18px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01));
+      border: 1px solid rgba(255, 255, 255, 0.03);
+      box-shadow: 0 12px 36px rgba(2, 6, 23, 0.6);
+      max-width: 980px;
+      width: 100%;
+      transform-style: preserve-3d;
+      z-index: 10;
+    }
+
+    .music-thumb {
+      width: 64px;
+      height: 64px;
+      border-radius: 10px;
+      overflow: hidden;
+      flex: 0 0 64px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.45)
+    }
+
+    .music-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block
+    }
+
+    .music-main {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 8px
+    }
+
+    .music-title {
+      font-weight: 800;
+      color: var(--accent-c)
+    }
+
+    .controls {
+      display: flex;
+      align-items: center;
+      gap: 14px
+    }
+
+    .control-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01));
+    }
+
+    .control-btn.playing {
+      background: linear-gradient(180deg, var(--accent-c), var(--accent-p));
+      transform: scale(1.03);
+      color: #021022
+    }
+
+    .big-progress {
+      height: 8px;
+      background: rgba(255, 255, 255, 0.06);
+      border-radius: 999px;
+      overflow: hidden;
+      position: relative
+    }
+
+    .big-progress .fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--accent-c), var(--accent-p));
+      transition: width .08s linear
+    }
+
+    .big-progress .dot {
+      position: absolute;
+      top: 50%;
+      left: 0;
+      width: 12px;
+      height: 12px;
+      transform: translate(-50%, -50%);
+      border-radius: 50%;
+      background: white;
+      box-shadow: 0 8px 28px rgba(0, 0, 0, 0.45)
+    }
+
+    .time-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 13px;
+      color: var(--muted)
+    }
+
+    .volume-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px;
+      border-radius: 10px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.012), rgba(255, 255, 255, 0.006));
+      border: 1px solid rgba(255, 255, 255, 0.02)
+    }
+
+    .volume-wrap input[type=range] {
+      width: 160px;
+      height: 8px;
+      -webkit-appearance: none;
+      background: transparent;
+    }
+
+    .volume-wrap input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4)
+    }
+
+    /* custom cursor */
+    body.hide-default-cursor {
+      cursor: none
+    }
+
+    .cursor-dot {
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, #fff, #9fe7f0 30%, rgba(102, 126, 234, 0.12) 70%);
+      box-shadow: 0 0 20px rgba(0, 240, 230, 0.12), 0 0 40px rgba(167, 139, 250, 0.06);
+      pointer-events: none;
+      transform: translate(-50%, -50%);
+      z-index: 99999
+    }
+
+    @media (max-width:900px) {
+      .info-card {
+        flex-direction: column;
+        align-items: center;
+        padding: 18px
+      }
+
+      .left {
+        width: 100%;
+        order: 0;
+        flex-direction: row;
+        justify-content: center
+      }
+
+      .right {
+        width: 100%;
+        text-align: center
+      }
+
+      .subcards {
+        flex-direction: column
+      }
+
+      .panel-wrap {
+        gap: 12px
+      }
+
+      .music-wrap {
+        flex-direction: column;
+        align-items: stretch
+      }
+
+      .volume-wrap input[type=range] {
+        width: 120px
+      }
+    }
+  </style>
 </head>
+
 <body>
 
-<!-- Click-to-enter overlay -->
-<div id="overlay">
-  <div>Click to Enter</div>
-  <canvas id="snowCanvas"></canvas>
-</div>
-
-<div class="stage" id="stage">
-
-  <div class="layer" id="bg">
-    <div class="shape s1" data-speed="0.06"></div>
-    <div class="shape s2" data-speed="0.03"></div>
-    <div class="shape s3" data-speed="0.08"></div>
+  <!-- overlay: snow + enter -->
+  <div id="overlay" role="dialog" aria-label="Enter site">
+    <div>Welcome — Click to enter</div>
+    <button class="enter-btn" id="enterBtn">Enter Site & Play</button>
+    <canvas id="snowCanvas" aria-hidden="true"></canvas>
   </div>
 
-  <div style="display:flex;flex-direction:column;align-items:center;z-index:3;">
-    <div class="card" id="card">
-      <div class="avatar" id="avatar">
-        <img src="assets/f2684f1e77b61d7d32243d9bfe36d445.gif" alt="Profile">
-        <canvas class="particles-canvas" id="particleCanvas"></canvas>
-      </div>
-      <div class="meta">
-        <h1>Sulav Pariyar</h1>
-        <p>Programmer / Editor — turning ideas into code & visuals.</p>
-        <div class="links">
-          <a href="https://www.facebook.com/anjal.pariyar.758" target="_blank">Facebook</a>
-          <a href="https://www.instagram.com/sulav5158/" target="_blank">Instagram</a>
-          <a href="https://x.com/sulav01276" target="_blank">Twitter</a>
-          <a href="https://github.com/AMESTER-7/" target="_blank">GitHub</a>
-          <a href="https://discord.com/channels/@me/1424757081256362069" target="_blank">Discord</a>
+  <!-- main layout -->
+  <div class="layout">
+    <div class="panel-wrap">
+
+      <!-- INFO CARD -->
+      <div class="info-card" role="region" aria-label="Profile information card">
+        <div class="left">
+          <div class="avatar" id="avatar">
+            <!-- Using uploaded image path from the conversation so you can preview it quickly.
+               If you want different avatar, replace src with your file in assets/ -->
+            <img id="avatarImg" src="assets/f2684f1e77b61d7d32243d9bfe36d445.gif" alt="Sulav Pariyar">
+            <canvas id="avatarParticles" width="160" height="160" aria-hidden="true"></canvas>
+          </div>
+
+          <div style="display:flex;gap:8px;align-items:center">
+            <div class="badge cyan" title="badge">◆</div>
+            <div class="badge purple" title="star">★</div>
+          </div>
+        </div>
+
+        <div class="right">
+          <div class="name-wrap">
+            <div class="name" id="displayName" aria-live="polite"></div>
+            <div class="badges" aria-hidden="true">
+              <div class="badge cyan" style="width:22px;height:22px;font-size:11px;border-radius:6px">+1</div>
+              <div class="badge purple" style="width:22px;height:22px;font-size:11px;border-radius:6px">⋆</div>
+            </div>
+          </div>
+
+          <div class="tagline" id="tagline">[+] Dev | C, C++, PY, JS & Editor</div>
+
+          <div class="subcards" aria-hidden="false">
+            <div class="subcard">
+              <div class="icon">
+                <!-- Replace icon path -->
+                <img src="assets/4eff17f491216c6c9a0528fddd299beb.gif" alt=""
+                  style="width:44px;height:44px;object-fit:cover;">
+              </div>
+              <div style="min-width:0">
+                <div class="title">Ace_God</div>
+                <div class="desc">Jesus My Saviour</div>
+              </div>
+            </div>
+
+            <div class="subcard">
+              <div class="icon">
+                <img src="assets/222837.gif" alt="" style="width:56px;height:56px;object-fit:cover;">
+              </div>
+              <div style="min-width:0">
+                <div class="title">Black Myth Wukong</div>
+                <div class="desc">Action RPG / Hard Mode Active</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="social-row" role="navigation" aria-label="Social links">
+            <a href="#" target="_blank" rel="noopener" aria-label="Discord">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="#6f7ef0" aria-hidden="true">
+                <path
+                  d="M20 3H4c-.6 0-1 .4-1 1v16c0 .6.4 1 1 1h12l4-4V4c0-.6-.4-1-1-1zM8.5 11.75c-.7 0-1.25-.55-1.25-1.25S7.8 9.25 8.5 9.25 9.75 9.8 9.75 10.5 9.2 11.75 8.5 11.75zM15.5 11.75c-.7 0-1.25-.55-1.25-1.25s.55-1.25 1.25-1.25 1.25.55 1.25 1.25-.55 1.25-1.25 1.25z" />
+              </svg>
+            </a>
+            <a href="#" target="_blank" rel="noopener" aria-label="YouTube">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="#ff3333" aria-hidden="true">
+                <path d="M10 15l5.2-3L10 9v6z" />
+              </svg>
+            </a>
+            <a href="#" target="_blank" rel="noopener" aria-label="Telegram">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="#2aa7ff" aria-hidden="true">
+                <path
+                  d="M21.2 3.1L2.9 10.1c-.4.2-.4.8 0 1l3.9 1.8 1.9 6c.2.6 1 1 1.6.6l2.4-1.6 3.9 2.9c.5.3 1.2-.1 1.1-.7L22 4c0-.6-.7-1-1.4-.9z" />
+              </svg>
+            </a>
+            <a href="#" target="_blank" rel="noopener" aria-label="Instagram">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="#ff6e9a" aria-hidden="true">
+                <path
+                  d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5zm5 6.2A4.8 4.8 0 1 0 16.8 13 4.8 4.8 0 0 0 12 8.2zM18.4 6.3a1.1 1.1 0 1 1-1.1-1.1 1.1 1.1 0 0 1 1.1 1.1z" />
+              </svg>
+            </a>
+            <a href="#" target="_blank" rel="noopener" aria-label="GitHub">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="#ffffff" aria-hidden="true">
+                <path
+                  d="M12 .5a12 12 0 0 0-3.8 23.4c.6.1.8-.3.8-.6v-2.1c-3.3.7-4-1.6-4-1.6-.5-1.4-1.3-1.8-1.3-1.8-1.1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1.1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.8-1.6-2.7-.3-5.5-1.3-5.5-5.9 0-1.3.5-2.4 1.3-3.2-.1-.3-.6-1.5.1-3.2 0 0 1-.3 3.3 1.2a11.6 11.6 0 0 1 6 0c2.3-1.5 3.3-1.2 3.3-1.2.7 1.7.3 2.9.1 3.2.8.8 1.3 1.9 1.3 3.2 0 4.6-2.8 5.6-5.5 5.9.4.3.8 1 .8 2.1v3.1c0 .3.2.7.8.6A12 12 0 0 0 12 .5z" />
+              </svg>
+            </a>
+          </div>
         </div>
       </div>
-    </div>
 
-    <div class="music-card" id="musicCard">
-      <div class="music-controls">
-        <div class="song-title">🎵 Eden’s Echo – Parvah Nahi</div>
-        <button id="toggleBtn">▶️</button>
+      <!-- MUSIC BAR -->
+      <div class="music-wrap" id="musicWrap" role="region" aria-label="Music player">
+        <div class="music-thumb"><img id="thumbImg" src="assets/199397.gif" alt="track thumbnail"></div>
+        <div class="music-main">
+          <div class="music-title" id="songTitle">Middle of night</div>
+
+          <div style="display:flex;align-items:center;gap:12px">
+            <div class="controls" aria-hidden="false">
+              <div class="control-btn" id="skipBack" title="Previous"><svg width="14" height="14" viewBox="0 0 24 24"
+                  fill="currentColor">
+                  <path d="M6 6v12l8.5-6zM16 6h2v12h-2z" />
+                </svg></div>
+
+              <div class="control-btn" id="playToggle" title="Play/Pause" aria-pressed="false">
+                <svg id="playIcon" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M5 3v18l15-9L5 3z" />
+                </svg>
+              </div>
+
+              <div class="control-btn" id="skipForward" title="Next"><svg width="14" height="14" viewBox="0 0 24 24"
+                  fill="currentColor">
+                  <path d="M8 6v12l8.5-6zM4 6h2v12H4z" />
+                </svg></div>
+            </div>
+
+            <div style="flex:1">
+              <div class="big-progress" id="progressBar" aria-hidden="false">
+                <div class="fill" id="progressFill"></div>
+                <div class="dot" id="progressDot"></div>
+              </div>
+              <div class="time-row" style="justify-content:space-between;margin-top:6px">
+                <div id="currentTime">0:00</div>
+                <div id="totalTime">0:00</div>
+              </div>
+            </div>
+
+            <div class="volume-wrap" title="Volume">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="#7fe4d9" aria-hidden="true">
+                <path d="M5 9v6h4l5 4V5L9 9H5z" />
+              </svg>
+              <input id="volumeRange" type="range" min="0" max="1" step="0.01" value="0.45" aria-label="Volume control">
+            </div>
+          </div>
+        </div>
+
+        <!-- audio element: replace the src with your mp3 file (use URL friendly filename) -->
+        <audio id="audio" src="assets/Eden's Echo - Parvah Nahi (Official Lyric Video).mp3" preload="metadata"></audio>
       </div>
-      <div class="progress">
-        <div class="progress-fill" id="musicProgress"></div>
-        <div class="progress-dot" id="progressDot"></div>
-      </div>
-      <div class="volume-control">
-        🔊 <input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="0.45">
-      </div>
-      <audio id="audioPlayer" src="assets/Eden's Echo - Parvah Nahi (Official Lyric Video).mp3" loop></audio>
+
     </div>
   </div>
 
-  <div class="cursor-follower" id="follower"></div>
-</div>
+  <!-- custom cursor -->
+  <div class="cursor-dot" id="cursorDot" aria-hidden="true"></div>
 
-<footer>Move your mouse — polygon/magnet effect active.</footer>
+  <!-- ====== SCRIPT: all behavior ====== -->
+  <script>
+    /* shorthand */
+    const $ = s => document.querySelector(s);
+    const $$ = s => Array.from(document.querySelectorAll(s));
 
-<script>
-(() => {
+    /* ===== overlay snow + enter ===== */
+    (function overlay() {
+      const overlay = $('#overlay');
+      const enter = $('#enterBtn');
+      const canvas = $('#snowCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      let w = 0, h = 0, raf = 0;
+      function resize() { w = canvas.width = overlay.offsetWidth; h = canvas.height = overlay.offsetHeight; }
+      resize(); window.addEventListener('resize', resize);
 
-  /*================ Overlay Snow =================*/
-  const overlay = document.getElementById('overlay');
-  const snowCanvas = document.getElementById('snowCanvas');
-  const snowCtx = snowCanvas.getContext('2d');
-  let sw = snowCanvas.width = overlay.offsetWidth;
-  let sh = snowCanvas.height = overlay.offsetHeight;
+      const flakes = [];
+      const F = 160;
+      for (let i = 0; i < F; i++) flakes.push({ x: Math.random() * w, y: Math.random() * h, r: Math.random() * 2.2 + .8, dy: Math.random() * 0.8 + .2, dx: (Math.random() - 0.5) * 0.4, a: Math.random() * .7 + .2 });
 
-  const flakes = [];
-  const flakeCount = 150;
-  for(let i=0;i<flakeCount;i++){
-    flakes.push({
-      x: Math.random()*sw,
-      y: Math.random()*sh,
-      r: Math.random()*3+1,
-      dy: Math.random()*1+0.3
-    });
-  }
-
-  function animateSnow(){
-    snowCtx.clearRect(0,0,sw,sh);
-    flakes.forEach(f=>{
-      f.y += f.dy;
-      if(f.y > sh) f.y = -f.r;
-      snowCtx.beginPath();
-      snowCtx.arc(f.x,f.y,f.r,0,Math.PI*2);
-      snowCtx.fillStyle='white';
-      snowCtx.fill();
-    });
-    requestAnimationFrame(animateSnow);
-  }
-  animateSnow();
-
-  window.addEventListener('resize', ()=>{
-    sw = snowCanvas.width = overlay.offsetWidth;
-    sh = snowCanvas.height = overlay.offsetHeight;
-  });
-
-  overlay.addEventListener('click', ()=>{
-    overlay.classList.add('fade-out');
-    setTimeout(()=>overlay.style.display='none',800);
-    const audio = document.getElementById('audioPlayer');
-    if(audio) audio.play();
-  });
-
-  /*================ Main Dashboard =================*/
-  const stage = document.getElementById('stage');
-  const follower = document.getElementById('follower');
-  const bg = document.getElementById('bg');
-  const card = document.getElementById('card');
-  const avatar = document.getElementById('avatar');
-  const musicCard = document.getElementById('musicCard');
-  const shapes = Array.from(bg.querySelectorAll('.shape'));
-  const canvas = document.getElementById('particleCanvas');
-  const ctx = canvas.getContext('2d');
-
-  let width = canvas.width = canvas.offsetWidth;
-  let height = canvas.height = canvas.offsetHeight;
-
-  const particles = [];
-  const particleCount = 60;
-  for(let i=0;i<particleCount;i++){
-    particles.push({
-      x: Math.random()*width,
-      y: Math.random()*height,
-      r: Math.random()*2+1,
-      dx:(Math.random()-0.5)*0.5,
-      dy:(Math.random()-0.5)*0.5,
-      alpha: Math.random()*0.5+0.3
-    });
-  }
-
-  function animateParticles(){
-    ctx.clearRect(0,0,width,height);
-    const cx = width/2, cy = height/2;
-    const radius = width/2;
-    particles.forEach(p=>{
-      p.x+=p.dx; p.y+=p.dy;
-      const dist = Math.sqrt((p.x-cx)**2+(p.y-cy)**2);
-      if(dist>radius){
-        const angle = Math.random()*Math.PI*2;
-        p.x = cx+Math.cos(angle)*radius;
-        p.y = cy+Math.sin(angle)*radius;
+      function draw() {
+        ctx.clearRect(0, 0, w, h);
+        for (const f of flakes) {
+          f.x += f.dx; f.y += f.dy;
+          if (f.y > h + 10) { f.y = -10; f.x = Math.random() * w; }
+          if (f.x < -20) f.x = w + 20;
+          if (f.x > w + 20) f.x = -20;
+          ctx.beginPath();
+          ctx.fillStyle = 'rgba(255,255,255,' + f.a + ')';
+          ctx.arc(f.x, f.y, f.r, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        raf = requestAnimationFrame(draw);
       }
-      ctx.beginPath();
-      ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
-      ctx.fillStyle=`rgba(0,255,128,${p.alpha})`;
-      ctx.fill();
-    });
-    requestAnimationFrame(animateParticles);
-  }
-  animateParticles();
+      draw();
 
-  window.addEventListener('resize', ()=>{
-    width = canvas.width = canvas.offsetWidth;
-    height = canvas.height = canvas.offsetHeight;
-  });
+      enter.addEventListener('click', e => {
+        const audio = $('#audio');
+        audio.play().catch(() => { });
+        overlay.classList.add('fade-out');
+        document.body.classList.add('hide-default-cursor');
 
-  let pointer = { x: window.innerWidth/2, y: window.innerHeight/2 };
-  let target = { x: pointer.x, y: pointer.y };
-  let followerPos = { x: pointer.x, y: pointer.y };
-  const lerp = (a,b,t) => a+(b-a)*t;
+        // ensure video will show (some browsers require a paint after gesture)
+        const bg = document.getElementById('bgVid');
+        if (bg && bg.paused) {
+          // try to play video (muted) but ignore failures
+          bg.play().catch(() => { });
+        }
 
-  function normalizedPointer(px,py){
-    const cx = window.innerWidth/2, cy = window.innerHeight/2;
-    return {x:(px-cx)/cx, y:(py-cy)/cy};
-  }
+        setTimeout(() => { cancelAnimationFrame(raf); ctx.clearRect(0, 0, w, h); }, 700);
+      });
+    })();
 
-  function handleMove(px,py){ target.x=px; target.y=py; }
-  window.addEventListener('mousemove', e => handleMove(e.clientX,e.clientY), {passive:true});
-  window.addEventListener('touchstart', ev => { if(ev.touches[0]) handleMove(ev.touches[0].clientX, ev.touches[0].clientY); }, {passive:true});
-  window.addEventListener('touchmove', ev => { if(ev.touches[0]) handleMove(ev.touches[0].clientX, ev.touches[0].clientY); }, {passive:true});
+    /* ===== custom cursor dot ===== */
+    (function cursor() {
+      const dot = $('#cursorDot');
+      if (!dot) return;
+      let tx = innerWidth / 2, ty = innerHeight / 2, x = tx, y = ty;
+      const overlay = $('#overlay');
+      const obs = new MutationObserver(() => { if (overlay && overlay.classList.contains('fade-out')) dot.style.display = 'block'; });
+      if (overlay) obs.observe(overlay, { attributes: true });
 
-  function update(){
-    pointer.x = lerp(pointer.x,target.x,0.18);
-    pointer.y = lerp(pointer.y,target.y,0.18);
-    followerPos.x = lerp(followerPos.x,target.x,0.28);
-    followerPos.y = lerp(followerPos.y,target.y,0.28);
-    follower.style.transform = `translate3d(${followerPos.x}px, ${followerPos.y}px, 0)`;
+      window.addEventListener('mousemove', e => { tx = e.clientX; ty = e.clientY; }, { passive: true });
+      function lerp(a, b, t) { return a + (b - a) * t; }
+      function loop() {
+        x = lerp(x, tx, 0.18);
+        y = lerp(y, ty, 0.18);
+        dot.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+        requestAnimationFrame(loop);
+      }
+      loop();
+    })();
 
-    const n = normalizedPointer(pointer.x,pointer.y);
-    shapes.forEach(s=>{
-      const speed = parseFloat(s.dataset.speed||0.04);
-      const tx = n.x*(speed*window.innerWidth*0.12);
-      const ty = n.y*(speed*window.innerHeight*0.12);
-      const rot = n.x*speed*12;
-      s.style.transform = `translate3d(${tx}px, ${ty}px, 0) rotate(${rot}deg)`;
-    });
+    /* ===== avatar particle ring (clipped) ===== */
+    (function avatarParticles() {
+      const canvas = document.getElementById('avatarParticles');
+      if (!canvas) return;
+      const avatar = document.getElementById('avatar');
+      let w = canvas.width = avatar.clientWidth;
+      let h = canvas.height = avatar.clientHeight;
+      window.addEventListener('resize', () => { canvas.width = avatar.clientWidth; canvas.height = avatar.clientHeight; w = canvas.width; h = canvas.height; });
 
-    card.style.transform = `translate3d(${n.x*20}px,${n.y*12}px,0) rotateX(${-n.y*6}deg) rotateY(${n.x*6}deg)`;
-    avatar.style.transform = `translate3d(${n.x*28}px,${n.y*18}px,40px) rotate(${n.x*10}deg)`;
-    musicCard.style.transform = `translate3d(${n.x*22}px,${n.y*16}px,30px) rotateX(${-n.y*5}deg) rotateY(${n.x*5}deg)`;
+      const ctx = canvas.getContext('2d');
+      const particles = [];
+      const N = 60;
+      for (let i = 0; i < N; i++) {
+        particles.push({ x: Math.random() * w, y: Math.random() * h, r: Math.random() * 1.6 + .6, dx: (Math.random() - 0.5) * 0.6, dy: (Math.random() - 0.5) * 0.6, a: Math.random() * .6 + .2 });
+      }
 
-    requestAnimationFrame(update);
-  }
-  update();
+      function inCircle(x, y) { const cx = w / 2, cy = h / 2, R = w / 2; return (x - cx) * (x - cx) + (y - cy) * (y - cy) <= R * R; }
 
-  // Music logic
-  const audio = document.getElementById('audioPlayer');
-  const toggleBtn = document.getElementById('toggleBtn');
-  const progress = document.getElementById('musicProgress');
-  const progressDot = document.getElementById('progressDot');
-  const volumeSlider = document.getElementById('volumeSlider');
+      function anim() {
+        ctx.clearRect(0, 0, w, h);
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(w / 2, h / 2, w / 2, 0, Math.PI * 2);
+        ctx.closePath();
+        ctx.clip();
+        for (const p of particles) {
+          p.x += p.dx; p.y += p.dy;
+          if (!inCircle(p.x, p.y)) {
+            const ang = Math.atan2(h / 2 - p.y, w / 2 - p.x);
+            p.x = w / 2 + Math.cos(ang) * (w / 2 - Math.random() * 6);
+            p.y = h / 2 + Math.sin(ang) * (h / 2 - Math.random() * 6);
+          }
+          ctx.beginPath();
+          ctx.fillStyle = `rgba(167,139,250,${p.a})`;
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.restore();
+        requestAnimationFrame(anim);
+      }
+      anim();
+    })();
 
-  toggleBtn.onclick = ()=>{
-    if(audio.paused){
-      audio.play();
-      toggleBtn.textContent="⏸️";
-      toggleBtn.classList.add("playing");
-      setTimeout(()=>toggleBtn.classList.remove("playing"),200);
-    } else {
-      audio.pause();
-      toggleBtn.textContent="▶️";
-      toggleBtn.classList.add("playing");
-      setTimeout(()=>toggleBtn.classList.remove("playing"),200);
-    }
-  }
+    /* ===== Parallax magnet for info + music + avatar ===== */
+    (function parallax() {
+      const card = document.querySelector('.info-card');
+      const music = document.getElementById('musicWrap');
+      const avatar = document.getElementById('avatar');
+      function onmove(e) {
+        const x = e.clientX / innerWidth - 0.5;
+        const y = e.clientY / innerHeight - 0.5;
+        if (card) card.style.transform = `translate3d(${x * 18}px, ${y * 12}px, 0) rotateX(${-y * 6}deg) rotateY(${x * 6}deg)`;
+        if (music) music.style.transform = `translate3d(${x * 12}px, ${y * 8}px, 0) rotateX(${-y * 3}deg) rotateY(${x * 3}deg)`;
+        if (avatar) avatar.style.transform = `translate3d(${x * 18}px, ${y * 12}px, 40px) rotate(${x * 8}deg)`;
+      }
+      window.addEventListener('mousemove', onmove, { passive: true });
+    })();
 
-  function updateProgress(){
-    if(audio.duration){
-      const percent = (audio.currentTime/audio.duration)*100;
-      progress.style.width = percent+"%";
-      progressDot.style.left = percent+"%";
-    }
-    requestAnimationFrame(updateProgress);
-  }
-  updateProgress();
+    /* ===== Typewriter for the name (works) ===== */
+    (function typewriter() {
+      const el = document.getElementById('displayName');
+      const names = ["Sulav Pariyar"]; // you can add alternate strings
+      let ni = 0, ci = 0, forward = true;
+      const ts = 90, bs = 40, pause = 900;
+      function step() {
+        const cur = names[ni];
+        if (forward) {
+          ci++;
+          el.textContent = cur.slice(0, ci);
+          if (ci >= cur.length) { forward = false; setTimeout(step, pause); return; }
+          setTimeout(step, ts + Math.random() * 40);
+        } else {
+          ci--;
+          el.textContent = cur.slice(0, ci);
+          if (ci <= 0) { forward = true; ni = (ni + 1) % names.length; setTimeout(step, 250); return; }
+          setTimeout(step, bs + Math.random() * 30);
+        }
+      }
+      step();
+    })();
 
-  volumeSlider.addEventListener('input', e => { audio.volume = e.target.value; });
+    /* ===== Music player logic (same magnet animation applied through CSS transform above) ===== */
+    (function music() {
+      const audio = $('#audio');
+      const playToggle = $('#playToggle');
+      const playIcon = $('#playIcon');
+      const progressFill = $('#progressFill');
+      const progressDot = $('#progressDot');
+      const progressBar = $('#progressBar');
+      const currentTime = $('#currentTime');
+      const totalTime = $('#totalTime');
+      const vol = $('#volumeRange');
+      const thumb = $('#thumbImg');
+      const skipBack = $('#skipBack');
+      const skipForward = $('#skipForward');
 
-})();
-</script>
+      // initial volume
+      audio.volume = Number(vol.value);
+
+      function fmt(s) {
+        if (isNaN(s)) return '0:00';
+        const m = Math.floor(s / 60);
+        const ss = Math.floor(s % 60).toString().padStart(2, '0');
+        return `${m}:${ss}`;
+      }
+
+      audio.addEventListener('loadedmetadata', () => { totalTime.textContent = fmt(audio.duration); });
+      audio.addEventListener('timeupdate', () => {
+        if (audio.duration) {
+          const pct = (audio.currentTime / audio.duration) * 100;
+          progressFill.style.width = pct + '%';
+          progressDot.style.left = pct + '%';
+          currentTime.textContent = fmt(audio.currentTime);
+        }
+      });
+
+      // seek
+      progressBar.addEventListener('click', (e) => {
+        const rect = progressBar.getBoundingClientRect();
+        const pct = (e.clientX - rect.left) / rect.width;
+        if (audio.duration) audio.currentTime = pct * audio.duration;
+      });
+
+      function setPlaying(on) {
+        if (on) {
+          playToggle.classList.add('playing');
+          playIcon.innerHTML = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" fill="currentColor"/>';
+          playToggle.setAttribute('aria-pressed', 'true');
+        } else {
+          playToggle.classList.remove('playing');
+          playIcon.innerHTML = '<path d="M5 3v18l15-9L5 3z" fill="currentColor"/>';
+          playToggle.setAttribute('aria-pressed', 'false');
+        }
+      }
+
+      playToggle.addEventListener('click', () => {
+        if (audio.paused) { audio.play().catch(() => { }); setPlaying(true); }
+        else { audio.pause(); setPlaying(false); }
+      });
+
+      audio.addEventListener('play', () => setPlaying(true));
+      audio.addEventListener('pause', () => setPlaying(false));
+      audio.addEventListener('ended', () => setPlaying(false));
+
+      vol.addEventListener('input', e => { audio.volume = Number(e.target.value); });
+
+      thumb.addEventListener('click', () => {
+        const url = prompt('Enter thumbnail URL or local path (e.g. assets/new-thumb.jpg):', thumb.src);
+        if (url) thumb.src = url;
+      });
+
+      skipBack.addEventListener('click', () => { audio.currentTime = Math.max(0, audio.currentTime - 10); });
+      skipForward.addEventListener('click', () => { audio.currentTime = Math.min(audio.duration || 0, audio.currentTime + 10); });
+    })();
+    
+  </script>
+
 </body>
+
 </html>
