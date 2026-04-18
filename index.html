@@ -22,14 +22,13 @@
     }
 
     /* Base */
-    html, body {
-      height: 100%;
-      margin: 0;
-      font-family: Inter, system-ui, -apple-system, sans-serif;
-      color: #e6f7ff;
-      overflow: hidden;
-      background-color: var(--bg-1);
-    }
+   html, body {
+  height: 100%;
+  margin: 0;
+  background-color: #071026; /* Set a solid base color */
+  /* Remove any background-image from here so it doesn't cover the video layer */
+  overflow: hidden;
+}
 
     /* === BACKGROUND & VIDEO FIX === */
     .bg-layer {
@@ -58,19 +57,15 @@
 
     /* Fixed MP4 Looping Background */
     #bgVid {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      min-width: 100%;
-      min-height: 100%;
-      width: auto;
-      height: auto;
-      transform: translate(-50%, -50%);
-      object-fit: cover;
-      z-index: 2;
-      opacity: 0.6; /* Blends video with liquid background */
-      mix-blend-mode: screen;
-    }
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  min-width: 100%;
+  min-height: 100%;
+  transform: translate(-50%, -50%);
+  object-fit: cover;
+  opacity: 0.8; /* Adjusted for better visibility through the glass */
+}
 
     .bg-dim {
       position: absolute;
@@ -516,11 +511,13 @@
 <body>
 
   <div class="bg-layer">
-    <div class="liquid-bg"></div>
-    <video id="bgVid" autoplay loop muted playsinline>
+    <video id="bgVid" autoplay loop muted playsinline style="z-index: 1;">
       <source src="assets/dark-souls-knight-moewalls-com.mp4" type="video/mp4">
     </video>
-    <div class="bg-dim"></div>
+
+    <div class="liquid-bg" style="z-index: 0;"></div>
+
+    <div class="bg-dim" style="z-index: 2;"></div>
   </div>
 
   <div id="overlay" role="dialog" aria-label="Enter site">
