@@ -12,55 +12,44 @@
     :root {
       /* Base Cyberpunk Theme (Default) */
       --bg-base: #071026;
-      --bg-mix-1: #00f0e6; /* Cyan */
-      --bg-mix-2: #a78bfa; /* Purple */
-      --accent-c: var(--bg-mix-1);
-      --accent-p: var(--bg-mix-2);
+      --accent-c: #00f0e6; /* Cyan */
+      --accent-p: #a78bfa; /* Purple */
       --muted: #9aa7bf;
       --card-radius: 24px;
-      --glass-bg: rgba(15, 23, 36, 0.5);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --glass-shadow: 0 30px 60px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
-      --theme-name: 'Cyberpunk';
+      /* Adjusted for better contrast while remaining transparent */
+      --glass-bg: rgba(7, 16, 38, 0.35);
+      --glass-border: rgba(255, 255, 255, 0.1);
+      --glass-shadow: 0 30px 60px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.1);
     }
 
     /* Midnight Forest Theme */
     body.theme-forest {
       --bg-base: #03120f;
-      --bg-mix-1: #2d6a4f; /* Emerald */
-      --bg-mix-2: #1b4332; /* Deep green */
       --accent-c: #52b788;
       --accent-p: #2d6a4f;
-      --glass-bg: rgba(10, 25, 20, 0.5);
-      --theme-name: 'Midnight Forest';
+      --glass-bg: rgba(3, 18, 15, 0.4);
     }
 
     /* Sunset Theme */
     body.theme-sunset {
       --bg-base: #1a0b10;
-      --bg-mix-1: #ff7b54; /* Coral */
-      --bg-mix-2: #ffd56b; /* Gold */
       --accent-c: #ffb26b;
       --accent-p: #ff7b54;
-      --glass-bg: rgba(26, 11, 16, 0.5);
-      --theme-name: 'Sunset';
+      --glass-bg: rgba(26, 11, 16, 0.4);
     }
 
     /* Deep Ocean Theme */
     body.theme-ocean {
       --bg-base: #010a15;
-      --bg-mix-1: #00b4d8; /* Sky blue */
-      --bg-mix-2: #0077b6; /* Ocean blue */
       --accent-c: #90e0ef;
       --accent-p: #0077b6;
-      --glass-bg: rgba(1, 10, 21, 0.5);
-      --theme-name: 'Deep Ocean';
+      --glass-bg: rgba(1, 10, 21, 0.4);
     }
 
     html, body {
       height: 100%;
       margin: 0;
-      background-color: transparent; /* Changed from var(--bg-base) to reveal canvas */
+      background-color: transparent; 
       overflow: hidden;
       font-family: 'Inter', sans-serif;
     }
@@ -73,21 +62,17 @@
       width: 100vw;
       height: 100vh;
       pointer-events: none;
-      background-color: var(--bg-base); /* Moved background here */
-      transition: background-color 1s ease; /* Moved transition here */
+      background-color: var(--bg-base);
+      /* Added opacity to the transition for smooth theme switching */
+      transition: background-color 1s ease, opacity 0.4s ease;
     }
 
+    /* Vignette overlay - NO BLUR here so the canvas pops */
     .bg-dim {
-      position: fixed; /* Changed to fixed to prevent scroll glitches */
+      position: fixed;
       inset: 0;
       z-index: -10;
-      /* Mixed color gradient overlay */
-      background: linear-gradient(135deg, 
-        rgba(var(--bg-mix-1-rgb, 0, 240, 230), 0.2), 
-        rgba(var(--bg-mix-2-rgb, 167, 139, 250), 0.2)
-      );
-      backdrop-filter: blur(20px); /* Reduced blur to reveal particles */
-      -webkit-backdrop-filter: blur(20px);
+      background: radial-gradient(circle at center, transparent 20%, rgba(0, 0, 0, 0.6) 100%);
       pointer-events: none;
     }
 
@@ -117,10 +102,10 @@
       transform: translateY(0);
     }
     .theme-toggle:hover {
-      background: rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.15);
       transform: scale(1.1) rotate(15deg);
       border-color: var(--accent-c);
-      box-shadow: 0 10px 30px rgba(var(--accent-c), 0.3);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
     }
 
     /* === LAYOUT === */
@@ -148,7 +133,7 @@
       align-items: center;
       justify-content: center;
       flex-direction: column;
-      background: rgba(3, 6, 12, 0.9);
+      background: rgba(3, 6, 12, 0.95);
       backdrop-filter: blur(30px);
       -webkit-backdrop-filter: blur(30px);
       color: #fff;
@@ -168,7 +153,7 @@
       background: rgba(255, 255, 255, 0.05);
       backdrop-filter: blur(10px);
       cursor: pointer;
-      color: #e6f7ff;
+      color: #fff;
       font-weight: 700;
       letter-spacing: 1px;
       transition: all 0.3s ease;
@@ -176,9 +161,9 @@
       overflow: hidden;
     }
     .enter-btn:hover {
-      background: rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.15);
       transform: translateY(-2px);
-      box-shadow: 0 10px 20px rgba(0, 240, 230, 0.15);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
       border-color: var(--accent-c);
     }
 
@@ -192,17 +177,25 @@
       perspective: 2000px;
     }
 
-    /* === GLASSMORPHISM CARDS === */
+    /* === GLASSMORPHISM CARDS (UPDATED) === */
     .glass-panel {
       background: var(--glass-bg);
       border-radius: var(--card-radius);
-      border: 1px solid var(--glass-border);
-      box-shadow: var(--glass-shadow);
+      /* Increased border opacity for a crisper edge */
+      border: 1px solid rgba(255, 255, 255, 0.2); 
+      /* Deeper drop shadow for elevation + inner light rim */
+      box-shadow: 0 40px 80px rgba(0, 0, 0, 0.8), inset 0 2px 2px rgba(255, 255, 255, 0.15);
+      /* Increased blur and saturation to make the text highly readable */
       backdrop-filter: blur(24px) saturate(150%);
       -webkit-backdrop-filter: blur(24px) saturate(150%);
       transform-style: preserve-3d;
-      transition: transform 0.1s ease-out, background 1s ease;
+      transition: transform 0.1s ease-out, background 1s ease, border-color 0.5s ease;
       position: relative;
+    }
+
+    /* Ensure UI elements transition smoothly with themes */
+    .badge, .name, .subcard, .social-row a, .tagline {
+      transition: all 0.5s ease !important; 
     }
 
     .info-card { display: flex; gap: 30px; padding: 32px; z-index: 10; }
@@ -210,7 +203,8 @@
 
     .avatar {
       width: 160px; height: 160px;
-      border-radius: 50%; overflow: hidden; position: relative;
+      border-radius: 50%; overflow: hidden;
+      position: relative;
       display: flex; align-items: center; justify-content: center;
       background: linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.01));
       box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5), inset 0 0 0 2px rgba(255,255,255,0.1);
@@ -218,7 +212,7 @@
     }
     .avatar:hover {
       transform: scale(1.05) translateZ(50px);
-      box-shadow: 0 20px 45px rgba(0, 0, 0, 0.6), inset 0 0 0 2px var(--accent-c);
+      box-shadow: 0 20px 45px rgba(0, 0, 0, 0.8), inset 0 0 0 2px var(--accent-c);
     }
     .avatar img { width: 100%; height: 100%; object-fit: cover; display: block; border-radius: 50%; }
     .avatar canvas { position: absolute; inset: 0; pointer-events: none; border-radius: 50%; mix-blend-mode: screen; }
@@ -233,16 +227,15 @@
       background: linear-gradient(to right, var(--accent-c), #ffffff);
       -webkit-background-clip: text; -webkit-text-fill-color: transparent;
       display: flex; align-items: center; white-space: nowrap;
-      transition: background 0.5s ease, -webkit-background-clip 0.5s ease;
+      text-shadow: 0 4px 20px rgba(0,0,0,0.5);
     }
-    .tagline { color: var(--muted); font-size: 15px; font-weight: 400; letter-spacing: 0.5px; transition: color 0.5s ease; }
+    .tagline { color: var(--muted); font-size: 15px; font-weight: 600; letter-spacing: 0.5px; }
 
     .badges { display: flex; gap: 8px; align-items: center; }
     .badge {
       display: inline-grid; place-items: center; border-radius: 8px;
-      font-size: 12px;
-      font-weight: 800; color: #fff;
-      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3); transition: transform 0.2s ease, background 0.5s ease;
+      font-size: 12px; font-weight: 800; color: #fff;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
     }
     .badge:hover { transform: translateY(-2px); }
     .badge.cyan { background: linear-gradient(135deg, var(--accent-c), #ffffff); color: #000; }
@@ -250,15 +243,13 @@
 
     .subcards { display: flex; gap: 16px; margin-top: 16px; }
     .subcard {
-      flex: 1; padding: 16px;
-      border-radius: 16px;
-      background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.05);
+      flex: 1; padding: 16px; border-radius: 16px;
+      background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.08);
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2); display: flex; gap: 14px; align-items: center;
-      transition: all 0.3s ease;
     }
     .subcard:hover {
-      background: rgba(255, 255, 255, 0.06);
-      border-color: rgba(255, 255, 255, 0.15);
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.2);
       transform: translateY(-4px); box-shadow: 0 15px 35px rgba(0,0,0,0.4);
     }
     .subcard .icon {
@@ -266,27 +257,24 @@
       display: grid; place-items: center; background: linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.01));
     }
     .subcard .title { font-weight: 800; color: #fff; font-size: 15px; }
-    .subcard .desc { font-size: 13px; color: var(--muted); margin-top: 4px; transition: color 0.5s ease; }
+    .subcard .desc { font-size: 13px; color: var(--muted); margin-top: 4px; }
 
     .social-row { display: flex; justify-content: flex-start; gap: 16px; margin-top: 20px; align-items: center; }
     .social-row a {
       width: 44px; height: 44px; display: inline-grid; place-items: center;
-      border-radius: 12px; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08);
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3); text-decoration: none; color: inherit;
-      transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+      border-radius: 12px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4); text-decoration: none; color: inherit;
     }
     .social-row a:hover {
-      transform: translateY(-6px) scale(1.05); background: rgba(255, 255, 255, 0.1);
-      border-color: var(--accent-c); box-shadow: 0 12px 24px rgba(0, 0, 0, 0.5);
+      transform: translateY(-6px) scale(1.05); background: rgba(255, 255, 255, 0.15);
+      border-color: var(--accent-c); box-shadow: 0 12px 24px rgba(0, 0, 0, 0.6);
     }
 
     /* === MUSIC PANEL === */
     .music-wrap { display: flex; align-items: center; gap: 18px; padding: 18px 24px; z-index: 10; }
     .music-thumb {
-      width: 70px;
-      height: 70px; border-radius: 12px; overflow: hidden; flex: 0 0 70px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4); cursor: pointer;
-      transition: transform 0.3s ease;
+      width: 70px; height: 70px; border-radius: 12px; overflow: hidden; flex: 0 0 70px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); cursor: pointer; transition: transform 0.3s ease;
     }
     .music-thumb:hover { transform: scale(1.05) rotate(2deg); }
     .music-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
@@ -296,23 +284,21 @@
     .controls { display: flex; align-items: center; gap: 14px; }
     
     .control-btn {
-      width: 40px; height: 40px;
-      border-radius: 50%; display: grid; place-items: center; cursor: pointer;
-      border: 1px solid rgba(255, 255, 255, 0.08); background: rgba(255, 255, 255, 0.03);
+      width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; cursor: pointer;
+      border: 1px solid rgba(255, 255, 255, 0.1); background: rgba(255, 255, 255, 0.05);
       transition: all 0.2s ease; color: #fff;
     }
-    .control-btn:hover { background: rgba(255, 255, 255, 0.1); transform: scale(1.1); }
+    .control-btn:hover { background: rgba(255, 255, 255, 0.15); transform: scale(1.1); }
     .control-btn.playing {
       background: linear-gradient(135deg, var(--accent-c), var(--accent-p));
-      border-color: transparent; color: #021022;
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+      border-color: transparent; color: #021022; box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6);
     }
 
-    .big-progress { height: 8px; background: rgba(255, 255, 255, 0.08); border-radius: 999px; position: relative; cursor: pointer; }
+    .big-progress { height: 8px; background: rgba(255, 255, 255, 0.1); border-radius: 999px; position: relative; cursor: pointer; }
     .big-progress .fill {
       height: 100%; width: 0%; border-radius: 999px;
       background: linear-gradient(90deg, var(--accent-c), var(--accent-p));
-      box-shadow: 0 0 10px rgba(255,255,255,0.2); transition: background 0.5s ease;
+      box-shadow: 0 0 12px rgba(255,255,255,0.3); transition: background 0.5s ease;
     }
     .big-progress .dot {
       position: absolute; top: 50%; left: 0; width: 14px; height: 14px;
@@ -323,12 +309,11 @@
 
     .time-row { display: flex; align-items: center; font-size: 12px; font-weight: 600; color: var(--muted); transition: color 0.5s ease; }
     .volume-wrap {
-      display: flex; align-items: center; gap: 10px; padding: 8px 12px;
-      border-radius: 12px;
-      background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.05); color: var(--accent-c); transition: color 0.5s ease;
+      display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 12px;
+      background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); color: var(--accent-c); transition: color 0.5s ease;
     }
-    .volume-wrap input[type=range] { width: 100px; height: 6px; -webkit-appearance: none; background: rgba(255, 255, 255, 0.1); border-radius: 999px; outline: none; }
-    .volume-wrap input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; border-radius: 50%; background: #fff; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5); cursor: pointer; }
+    .volume-wrap input[type=range] { width: 100px; height: 6px; -webkit-appearance: none; background: rgba(255, 255, 255, 0.15); border-radius: 999px; outline: none; }
+    .volume-wrap input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; border-radius: 50%; background: #fff; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6); cursor: pointer; }
 
     /* === CUSTOM CURSOR === */
     body.hide-default-cursor { cursor: none; }
@@ -434,13 +419,13 @@
               <div class="control-btn" id="skipForward" title="Next"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M8 6v12l8.5-6zM4 6h2v12H4z" /></svg></div>
             </div>
             <div style="flex:1">
-              <div class="big-progress" id="progressBar">
+               <div class="big-progress" id="progressBar">
                 <div class="fill" id="progressFill"></div>
                 <div class="dot" id="progressDot"></div>
               </div>
               <div class="time-row" style="justify-content:space-between;margin-top:8px">
-                <div id="currentTime">0:00</div>
-                <div id="totalTime">0:00</div>
+                 <div id="currentTime">0:00</div>
+                 <div id="totalTime">0:00</div>
               </div>
             </div>
             <div class="volume-wrap" title="Volume">
@@ -459,7 +444,7 @@
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
   </div>
 
-  <div class="cursor-dot" id="cursorDot"></div>
+   <div class="cursor-dot" id="cursorDot"></div>
 
   <script>
     const $ = s => document.querySelector(s);
@@ -468,43 +453,54 @@
     // Global Mouse Tracking for Parallax, Cursor & Background Interaction
     let mouseX = window.innerWidth / 2;
     let mouseY = window.innerHeight / 2;
-    let targetX = 0, targetY = 0; // Normalized for panels
+    let targetX = 0, targetY = 0;
     let isClicking = false;
-    
     window.addEventListener('mousemove', e => { 
       mouseX = e.clientX; 
       mouseY = e.clientY; 
       targetX = (e.clientX / window.innerWidth - 0.5) * 2; 
       targetY = (e.clientY / window.innerHeight - 0.5) * 2;
     }, { passive: true });
-    
     window.addEventListener('mousedown', () => isClicking = true);
     window.addEventListener('mouseup', () => isClicking = false);
-    
+
     /* ===== LIVE INTERACTIVE THEME ENGINE ===== */
     (function initInteractiveThemes() {
       const themes = ['', 'theme-forest', 'theme-sunset', 'theme-ocean'];
       let currentThemeIndex = 0;
       const canvas = $('#bgCanvas');
       const ctx = canvas.getContext('2d');
-      let w, h, raf;
+      let w, h;
       let elements = [];
 
-      // Helper to convert CSS hex variable to RGB array [r, g, b]
-      const getThemeColorRgb = (varName) => {
-        const hex = getComputedStyle(document.body).getPropertyValue(varName).trim();
-        if (!hex || !hex.startsWith('#')) return [255, 255, 255]; // Fallback
-        const rgb = parseInt(hex.substring(1), 16);
-        return [(rgb >> 16) & 255, (rgb >> 8) & 255, rgb & 255];
+      // A robust way to fetch actual rendered CSS colors to pass into Canvas
+      const getThemeColors = () => {
+        const body = document.body;
+        const temp = document.createElement('div');
+        temp.style.color = 'var(--accent-c)';
+        temp.style.backgroundColor = 'var(--accent-p)';
+        body.appendChild(temp);
+        
+        const styles = getComputedStyle(temp);
+        const parseRgb = (str) => {
+          const match = str.match(/\d+/g);
+          return match ? [parseInt(match[0]), parseInt(match[1]), parseInt(match[2])] : [255, 255, 255];
+        };
+        
+        const colors = {
+          c: parseRgb(styles.color),
+          p: parseRgb(styles.backgroundColor)
+        };
+        body.removeChild(temp);
+        return colors;
       };
 
-      // Base design class to handle standard updates and drawing
       class BaseDesign {
         constructor() { this.init(); }
-        init() { this.x = Math.random() * w; this.y = Math.random() * h; this.colorVar = Math.random() > 0.5 ? '--accent-c' : '--accent-p'; }
+        init() { this.x = Math.random() * w; this.y = Math.random() * h; this.colorType = Math.random() > 0.5 ? 'c' : 'p'; }
         update() { this.autonomousFloat(); this.mouseRepel(); }
-        draw() { /* override */ }
-        autonomousFloat() { /* override */ }
+        draw() {}
+        autonomousFloat() {}
         mouseRepel() {
           const dx = mouseX - this.x;
           const dy = mouseY - this.y;
@@ -513,30 +509,30 @@
         }
       }
 
-      // Design 1: Interactive Particle Mesh (For Cyberpunk & Deep Ocean)
+      // Design 1: Interactive Particle Mesh 
       class ParticleMesh extends BaseDesign {
-        init() { super.init(); this.r = Math.random()*2+1; this.vx = (Math.random()-0.5); this.vy = (Math.random()-0.5); }
+        init() { super.init(); this.r = Math.random() * 3 + 1.5; this.vx = (Math.random()-0.5)*1.5; this.vy = (Math.random()-0.5)*1.5; }
         autonomousFloat() { this.x += this.vx; this.y += this.vy; if (this.x<0||this.x>w) this.vx*=-1; if (this.y<0||this.y>h) this.vy*=-1; }
-        draw(rgb1, rgb2) {
+        draw(colors) {
           ctx.beginPath();
-          const rgb = this.colorVar === '--accent-c' ? rgb1 : rgb2;
-          ctx.fillStyle = `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, 0.8)`;
+          const rgb = colors[this.colorType];
+          ctx.fillStyle = `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, 1)`;
           ctx.arc(this.x, this.y, this.r, 0, Math.PI*2);
           ctx.fill();
         }
       }
 
-      // Design 2: Shifting Live Waves (For Sunset)
+      // Design 2: Shifting Live Waves
       class LiveWaves extends BaseDesign {
         init() { super.init(); this.phase = Math.random()*Math.PI*2; this.baseY = this.y; }
         update() { this.phase += 0.02; this.mouseRepel(); }
-        draw(rgb1, rgb2) {
+        draw(colors) {
           ctx.beginPath();
-          const rgb = this.colorVar === '--accent-c' ? rgb1 : rgb2;
-          ctx.strokeStyle = `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, 0.2)`;
-          ctx.lineWidth = 1.5;
+          const rgb = colors[this.colorType];
+          ctx.strokeStyle = `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, 0.5)`;
+          ctx.lineWidth = 3;
           ctx.moveTo(0, this.baseY + Math.sin(this.phase) * 30);
-          for (let i = 1; i < w; i += 2) {
+          for (let i = 1; i < w; i += 4) {
             const y = this.baseY + Math.sin(this.phase + i * 0.01) * 30;
             ctx.lineTo(i, y + Math.cos(i*0.005 + this.phase*0.2)*20);
           }
@@ -544,14 +540,14 @@
         }
       }
 
-      // Design 3: Interactive Leaves (For Midnight Forest)
+      // Design 3: Interactive Leaves
       class InteractiveLeaves extends BaseDesign {
-        init() { super.init(); this.r = Math.random()*8+4; this.vx = (Math.random()-0.5); this.vy = Math.random()+0.5; this.angle = Math.random()*Math.PI*2; }
+        init() { super.init(); this.r = Math.random()*12+6; this.vx = (Math.random()-0.5)*1.5; this.vy = Math.random()*2+1; this.angle = Math.random()*Math.PI*2; }
         autonomousFloat() { this.x += this.vx; this.y += this.vy; this.angle += 0.01; if (this.y > h + this.r) { this.y = -this.r; this.x = Math.random()*w; } }
-        draw(rgb1, rgb2) {
+        draw(colors) {
           ctx.beginPath();
-          const rgb = this.colorVar === '--accent-c' ? rgb1 : rgb2;
-          ctx.fillStyle = `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, 0.5)`;
+          const rgb = colors[this.colorType];
+          ctx.fillStyle = `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, 0.8)`;
           ctx.save(); ctx.translate(this.x, this.y); ctx.rotate(this.angle);
           ctx.ellipse(0, 0, this.r, this.r*0.6, 0, 0, Math.PI*2);
           ctx.fill(); ctx.restore();
@@ -564,59 +560,73 @@
       function initializeElements() {
         const theme = themes[currentThemeIndex];
         elements = [];
-        let ClassToUse;
-        let count;
-
-        if (theme === 'theme-sunset') { ClassToUse = LiveWaves; count = 10; }
-        else if (theme === 'theme-forest') { ClassToUse = InteractiveLeaves; count = 30; }
-        else { ClassToUse = ParticleMesh; count = 80; } // Default: Mesh
+        let ClassToUse, count;
+        if (theme === 'theme-sunset') { ClassToUse = LiveWaves; count = 12; }
+        else if (theme === 'theme-forest') { ClassToUse = InteractiveLeaves; count = 50; }
+        else { ClassToUse = ParticleMesh; count = 130; } 
 
         elements = Array.from({length: count}, () => new ClassToUse());
       }
 
       function animate() {
         ctx.clearRect(0, 0, w, h);
-        const rgb1 = getThemeColorRgb('--accent-c'); const rgb2 = getThemeColorRgb('--accent-p');
+        const colors = getThemeColors();
 
-        elements.forEach((el, i) => { el.update(); el.draw(rgb1, rgb2); });
+        elements.forEach((el) => { el.update(); el.draw(colors); });
         
-        // Draw mesh lines for mesh design only
+        // Draw mesh connection lines
         if (elements[0] instanceof ParticleMesh) {
-          ctx.lineWidth = 0.5;
-          ctx.strokeStyle = `rgba(${rgb2[0]}, ${rgb2[1]}, ${rgb2[2]}, 0.05)`;
+          ctx.lineWidth = 1;
+          const rgb = colors.c; // Match primary accent color
+          ctx.strokeStyle = `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, 0.3)`;
           for (let i = 0; i < elements.length; i++) {
             for (let j = i + 1; j < elements.length; j++) {
               const dx = elements[i].x - elements[j].x;
               const dy = elements[i].y - elements[j].y;
               const dist = Math.sqrt(dx*dx+dy*dy);
-              if (dist < 150) { ctx.beginPath(); ctx.moveTo(elements[i].x, elements[i].y); ctx.lineTo(elements[j].x, elements[j].y); ctx.stroke(); }
+              if (dist < 180) { 
+                ctx.beginPath();
+                ctx.moveTo(elements[i].x, elements[i].y); 
+                ctx.lineTo(elements[j].x, elements[j].y); 
+                ctx.stroke(); 
+              }
             }
           }
         }
         requestAnimationFrame(animate);
       }
 
-      resize(); animate(); // Init
+      resize(); animate(); 
 
+      /* === UPDATED THEME TOGGLE ANIMATION === */
       $('#themeToggle').addEventListener('click', () => {
-        document.body.className = document.body.className.replace(/theme-\w+/g, '').trim();
-        currentThemeIndex = (currentThemeIndex + 1) % themes.length;
-        if (themes[currentThemeIndex]) document.body.classList.add(themes[currentThemeIndex]);
+        const bgCanvas = $('#bgCanvas');
         
-        // Re-set default cursor hide class if it was present
-        if(overlay.classList.contains('fade-out')) document.body.classList.add('hide-default-cursor');
+        // Fade out canvas
+        bgCanvas.style.opacity = '0';
         
-        initializeElements(); // Re-init design
+        setTimeout(() => {
+          // Swap the theme classes
+          document.body.className = document.body.className.replace(/theme-\w+/g, '').trim();
+          currentThemeIndex = (currentThemeIndex + 1) % themes.length;
+          if (themes[currentThemeIndex]) document.body.classList.add(themes[currentThemeIndex]);
+          
+          if($('#overlay').classList.contains('fade-out')) document.body.classList.add('hide-default-cursor');
+          
+          // Generate new particles/waves for the active theme
+          initializeElements(); 
+          
+          // Fade canvas back in
+          bgCanvas.style.opacity = '1';
+        }, 400); // Wait for CSS opacity transition to complete
       });
     })();
-    
+
     /* ===== OVERLAY & INIT ===== */
     (function initOverlay() {
       const overlay = $('#overlay');
       const enterBtn = $('#enterBtn');
       const layout = $('#mainLayout');
-      
-      // Initial snowfall canvas
       const canvas = $('#snowCanvas');
       const ctx = canvas.getContext('2d');
       let w, h, raf;
@@ -631,7 +641,8 @@
       resize(); window.addEventListener('resize', resize);
 
       function drawSnow() {
-        ctx.clearRect(0, 0, w, h); flakes.forEach(f => { f.x+=f.dx; f.y+=f.dy; if(f.y>h)f.y=-10; if(f.x>w)f.x=0; else if(f.x<0)f.x=w; ctx.beginPath(); ctx.fillStyle=`rgba(255,255,255,${f.a})`; ctx.arc(f.x,f.y,f.r,0,Math.PI*2); ctx.fill(); });
+        ctx.clearRect(0, 0, w, h); 
+        flakes.forEach(f => { f.x+=f.dx; f.y+=f.dy; if(f.y>h)f.y=-10; if(f.x>w)f.x=0; else if(f.x<0)f.x=w; ctx.beginPath(); ctx.fillStyle=`rgba(255,255,255,${f.a})`; ctx.arc(f.x,f.y,f.r,0,Math.PI*2); ctx.fill(); });
         raf = requestAnimationFrame(drawSnow);
       }
       drawSnow();
@@ -656,11 +667,9 @@
       obs.observe($('#overlay'), { attributes: true });
 
       function loop() {
-        x += (mouseX - x) * 0.2; // Lerp smoothing
+        x += (mouseX - x) * 0.2; 
         y += (mouseY - y) * 0.2;
         dot.style.transform = `translate3d(${x}px, ${y}px, 0)`;
-        
-        // Visual feedback on click
         const targetScale = isClicking ? 0.7 : 1;
         dot.style.transform += ` scale(${targetScale})`;
         requestAnimationFrame(loop);
@@ -676,19 +685,16 @@
       let cx = 0, cy = 0;
 
       function animateParallax() {
-        cx += (targetX - cx) * 0.1; // Smooth dampening
+        cx += (targetX - cx) * 0.1; 
         cy += (targetY - cy) * 0.1;
-        
-        // 3D rotations based on mouse position
         if (card) card.style.transform = `perspective(2000px) translate3d(${cx * 20}px, ${cy * 15}px, 0) rotateX(${-cy * 6}deg) rotateY(${cx * 6}deg)`;
         if (music) music.style.transform = `perspective(2000px) translate3d(${cx * 15}px, ${cy * 10}px, 0) rotateX(${-cy * 3}deg) rotateY(${cx * 3}deg)`;
-        if (avatar) avatar.style.transform = `translate3d(${cx * 15}px, ${cy * 15}px, 60px) rotate(${cx * 10}deg)`; // Avatar parallax
-        
+        if (avatar) avatar.style.transform = `translate3d(${cx * 15}px, ${cy * 15}px, 60px) rotate(${cx * 10}deg)`;
         requestAnimationFrame(animateParallax);
       }
       animateParallax();
     })();
-    
+
     /* ===== TYPEWRITER ===== */
     (function initTypewriter() {
       const el = $('#displayName');
@@ -701,7 +707,7 @@
       }
       step();
     })();
-    
+
     /* ===== AVATAR PARTICLES ===== */
     (function initAvatarParticles() {
       const canvas = $('#avatarParticles'); const avatar = $('#avatar');
@@ -712,26 +718,56 @@
       function anim() {
         ctx.clearRect(0, 0, w, h); ctx.save(); ctx.beginPath(); ctx.arc(w/2, h/2, w/2, 0, Math.PI*2); ctx.clip();
         const accentStr = getComputedStyle(document.body).getPropertyValue('--accent-p').trim();
-        particles.forEach(p => { p.x += p.dx; p.y += p.dy; const distSq = (p.x - w/2)**2 + (p.y - h/2)**2; if (distSq > (w/2)**2) { const ang = Math.atan2(h/2 - p.y, w/2 - p.x); p.x = w/2 + Math.cos(ang) * (w/2 - 2); p.y = h/2 + Math.sin(ang) * (h/2 - 2); } ctx.beginPath(); ctx.fillStyle = accentStr; ctx.globalAlpha = p.a; ctx.arc(p.x, p.y, p.r, 0, Math.PI*2); ctx.fill(); ctx.globalAlpha = 1.0; });
+        particles.forEach(p => { 
+          p.x += p.dx; p.y += p.dy; 
+          const distSq = (p.x - w/2)**2 + (p.y - h/2)**2; 
+          if (distSq > (w/2)**2) { 
+            const ang = Math.atan2(h/2 - p.y, w/2 - p.x); 
+            p.x = w/2 + Math.cos(ang) * (w/2 - 2);
+            p.y = h/2 + Math.sin(ang) * (h/2 - 2); 
+          } 
+          ctx.beginPath(); ctx.fillStyle = accentStr; ctx.globalAlpha = p.a;
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI*2); ctx.fill(); ctx.globalAlpha = 1.0; 
+        });
         ctx.restore(); requestAnimationFrame(anim);
       }
       anim();
     })();
-    
+
     /* ===== MUSIC PLAYER ===== */
     (function initMusic() {
       const audio = $('#audio'), playToggle = $('#playToggle'), playIcon = $('#playIcon'), progressFill = $('#progressFill'), progressDot = $('#progressDot'), progressBar = $('#progressBar'), currentTime = $('#currentTime'), totalTime = $('#totalTime'), vol = $('#volumeRange'), thumb = $('#thumbImg'), skipBack = $('#skipBack'), skipForward = $('#skipForward');
       audio.volume = Number(vol.value);
       const fmt = s => isNaN(s) ? '0:00' : `${Math.floor(s/60)}:${Math.floor(s%60).toString().padStart(2,'0')}`;
       audio.addEventListener('loadedmetadata', () => totalTime.textContent = fmt(audio.duration));
-      audio.addEventListener('timeupdate', () => { if (!audio.duration) return; const pct = (audio.currentTime / audio.duration) * 100; progressFill.style.width = pct + '%'; progressDot.style.left = pct + '%'; currentTime.textContent = fmt(audio.currentTime); });
-      progressBar.addEventListener('click', e => { const rect = progressBar.getBoundingClientRect(); if (audio.duration) audio.currentTime = ((e.clientX - rect.left) / rect.width) * audio.duration; });
-      function setPlaying(on) { if (on) { playToggle.classList.add('playing'); playIcon.innerHTML = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" fill="currentColor"/>'; } else { playToggle.classList.remove('playing'); playIcon.innerHTML = '<path d="M5 3v18l15-9L5 3z" fill="currentColor"/>'; } }
+      audio.addEventListener('timeupdate', () => { 
+        if (!audio.duration) return; 
+        const pct = (audio.currentTime / audio.duration) * 100; 
+        progressFill.style.width = pct + '%'; 
+        progressDot.style.left = pct + '%'; 
+        currentTime.textContent = fmt(audio.currentTime); 
+      });
+      progressBar.addEventListener('click', e => { 
+        const rect = progressBar.getBoundingClientRect();
+        if (audio.duration) audio.currentTime = ((e.clientX - rect.left) / rect.width) * audio.duration; 
+      });
+      function setPlaying(on) { 
+        if (on) { 
+          playToggle.classList.add('playing');
+          playIcon.innerHTML = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" fill="currentColor"/>'; 
+        } else { 
+          playToggle.classList.remove('playing'); 
+          playIcon.innerHTML = '<path d="M5 3v18l15-9L5 3z" fill="currentColor"/>';
+        } 
+      }
       playToggle.addEventListener('click', () => audio.paused ? (audio.play().catch(()=>{}), setPlaying(true)) : (audio.pause(), setPlaying(false)));
-      audio.addEventListener('play', () => setPlaying(true)); audio.addEventListener('pause', () => setPlaying(false)); audio.addEventListener('ended', () => setPlaying(false));
+      audio.addEventListener('play', () => setPlaying(true)); 
+      audio.addEventListener('pause', () => setPlaying(false)); 
+      audio.addEventListener('ended', () => setPlaying(false));
       vol.addEventListener('input', e => audio.volume = Number(e.target.value));
       thumb.addEventListener('click', () => { const url = prompt('Enter thumbnail URL (e.g. assets/new.jpg):', thumb.src); if (url) thumb.src = url; });
-      skipBack.addEventListener('click', () => audio.currentTime = Math.max(0, audio.currentTime - 10)); skipForward.addEventListener('click', () => audio.currentTime = Math.min(audio.duration || 0, audio.currentTime + 10));
+      skipBack.addEventListener('click', () => audio.currentTime = Math.max(0, audio.currentTime - 10)); 
+      skipForward.addEventListener('click', () => audio.currentTime = Math.min(audio.duration || 0, audio.currentTime + 10));
     })();
   </script>
 </body>
